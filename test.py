@@ -40,6 +40,10 @@ def book_ticket(ticket_url):
         #driver.select("cc_start_time", "18002400")
         #该方法可以下拉菜单中选择时段，但是select标签没有name属性，使用id属性没有成功
 
+        #时间段选择
+        # driver.find_by_id("cc_start_time").click()
+        # driver.find_option_by_value("06001200").click()
+
         count = 0
         if order != 0:
             while driver.url == ticket_url:
@@ -72,10 +76,10 @@ def book_ticket(ticket_url):
 
         print("\n---> ^^提交订单")
         sleep(1)
-        driver.find_by_id('submitOrder_id').click()
-        sleep(1)
-        print("确认选座...")
-        driver.find_by_id('qr_submit_id').click()
+        # driver.find_by_id('submitOrder_id').click()
+        # sleep(1)
+        # print("确认选座...")
+        # driver.find_by_id('qr_submit_id').click()
 
 
     except Exception as e:
