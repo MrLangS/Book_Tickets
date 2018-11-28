@@ -2,11 +2,12 @@ from splinter.browser import Browser
 from time import sleep
 
 login_url = "https://kyfw.12306.cn/otn/login/init"
-initmy_url = "https://kyfw.12306.cn/otn/index/initMy12306"
+initmy_url = "https://kyfw.12306.cn/otn/view/index.html"
+# initmy_url = "https://kyfw.12306.cn/otn/index/initMy12306"
 ticket_url = "https://kyfw.12306.cn/otn/leftTicket/init"#购票页面
 
 order = 0  #车次，0代表所有车次，依次从上到下
-user = ["郎垿峰","郎晓峰"]#乘客姓名，若购学生票记得在姓名后面加括号
+user = ["郎垿峰"]#乘客姓名，若购学生票记得在姓名后面加括号
 
 driver = Browser(driver_name='chrome')
 driver.driver.set_window_size(1400, 1000)#设置打开的浏览器的窗口尺寸
@@ -30,8 +31,8 @@ def book_ticket(ticket_url):
     try:
         print("-------开始刷票-------")
         # 加载查询信息
-        driver.cookies.add({"_jc_save_fromStation": "%u676D%u5DDE%2CHZH"})#杭州
-        driver.cookies.add({"_jc_save_toStation": "%u90D1%u5DDE%2CZZF"})#郑州
+        driver.cookies.add({"_jc_save_fromStation": "%u5317%u4EAC%2CBJP"})#北京
+        driver.cookies.add({"_jc_save_toStation": "%u5A7A%u6E90%2CWYG"})#婺源
         driver.cookies.add({"_jc_save_fromDate": "2018-12-15"})
 
         sleep(2)
