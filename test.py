@@ -105,7 +105,6 @@ def book_ticket(ticket_url):
                        'var tag=tds['+seatType+'].innerHTML;' \
                        'if(tag!="<div>无</div>"&&tag!="--")' \
                        '{' \
-                       'tds['+seatType+'].innerHTML="有票";' \
                        'index.push(i);' \
                        '}' \
                        '};' \
