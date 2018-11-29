@@ -52,7 +52,7 @@ def payment():
         sleep(2)
         while True:
             if payment_url in driver.url:
-                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/workspace/LearnPy/learn/GetTickets/screen.png")
+                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/WorkSpace/LearnPy/Book_Tickets/screen.png")
                 screenshotName = screenshotURL.split('\\')[-1]
                 print('网页截图的名字：')
                 print(screenshotName)
@@ -148,11 +148,11 @@ def book_ticket(ticket_url):
         sleep(2)
         while True:
             if payment_url in driver.url:
-                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/workspace/LearnPy/learn/GetTickets/screen.png")
+                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/WorkSpace/LearnPy/Book_Tickets/screen.png")
                 screenshotName = screenshotURL.split('\\')[-1]
                 print('网页截图的名字：')
                 print(screenshotName)
-                my_friend.send('Hello!')
+                my_friend.send('Hello!半小时内完成付款即可成功购票')
                 my_friend.send_image(screenshotName)
                 break
     except Exception as e:
