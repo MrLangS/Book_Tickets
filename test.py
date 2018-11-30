@@ -4,18 +4,19 @@ from wxpy import *
 
 
 bot=Bot()
-my_friend = bot.friends().search('冠军')[0]
+my_friend = bot.friends().search('程玄昌')[0]
 login_url = "https://kyfw.12306.cn/otn/login/init"
 initmy_url = "https://kyfw.12306.cn/otn/view/index.html"
 # initmy_url = "https://kyfw.12306.cn/otn/index/initMy12306"
 ticket_url = "https://kyfw.12306.cn/otn/leftTicket/init"#购票页面
 orderList_url = "https://kyfw.12306.cn/otn/view/train_order.html"#订单页面
-onlinepay_url = "https://kyfw.12306.cn/otn//payOrder/init"#订单完成页面
+onlinepay_url = "https://kyfw.12306.cn/otn/payOrder/init"#订单完成页面
 payment_url = "https://mrexcashier.alipay.com/index.htm"#支付页面
 
 order = 0  #车次，0代表所有车次，依次从上到下
-user = ["倪明"]#乘客姓名，若购学生票记得在姓名后面加括号
+user = ["郎垿峰"]#乘客姓名，若购学生票记得在姓名后面加括号
 seatType = 3 #1为商务座，2为一等座，3为二等座，以此类推
+allType = False #所有票型都行，有票就抢
 
 
 driver = Browser(driver_name='chrome')
@@ -24,10 +25,10 @@ driver.driver.set_window_size(1400, 1000)#设置打开的浏览器的窗口尺�
 def login():
     driver.visit(login_url)
     # 填充密码
-    driver.fill("loginUserDTO.user_name", '980855285@qq.com')  # 后面为12306账号
-    driver.fill("userDTO.password", 'yan521680')  # 后面为密码
-    # driver.fill("loginUserDTO.user_name", '18401610488')#后面为12306账号
-    # driver.fill("userDTO.password", 'qazwsx110120119')#后面为密码
+    # driver.fill("loginUserDTO.user_name", '980855285@qq.com')  # 后面为12306账号
+    # driver.fill("userDTO.password", 'yan521680')  # 后面为密码
+    driver.fill("loginUserDTO.user_name", '18401610488')#后面为12306账号
+    driver.fill("userDTO.password", 'qazwsx110120119')#后面为密码
     print('''\n\n**********************
 **等待验证码，自行输入**
 **********************''')
@@ -37,27 +38,34 @@ def login():
         else:
             break
 
-def payment():
+def payment():#支付未完成订单时使用
     driver.visit(orderList_url)
 
     try:
         sleep(2)
         driver.find_by_text("去支付").click()
-        sleep(6)
-        driver.find_by_id("payButton").click()
+        # 支付部分
+        while True:
+            if onlinepay_url == driver.url:
+                sleep(6)
+                print("开始支付...")
+                driver.find_by_id("payButton").click()
+                break
         sleep(2)
-        driver.windows.current=driver.windows[1]
+        driver.windows.current = driver.windows[1]
         sleep(1)
         driver.find_by_xpath("/html/body/div[2]/div[2]/div/form/div[9]/div/img").click()
-        sleep(2)
         while True:
             if payment_url in driver.url:
-                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/WorkSpace/LearnPy/Book_Tickets/screen.png")
+                sleep(1)
+                driver.reload()
+                sleep(2)
+                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/workspace/LearnPy/learn/GetTickets/screen.png")
                 screenshotName = screenshotURL.split('\\')[-1]
                 print('网页截图的名字：')
                 print(screenshotName)
-                # my_friend.send('Hello!')
-                # my_friend.send_image(screenshotName)
+                my_friend.send('Hello!半小时内完成付款即可成功购票')
+                my_friend.send_image(screenshotName)
                 break
     except Exception as e:
         print(e)
@@ -69,7 +77,7 @@ def book_ticket(ticket_url):
         # 加载查询信息
         driver.cookies.add({"_jc_save_fromStation": "%u5317%u4EAC%2CBJP"})#北京
         driver.cookies.add({"_jc_save_toStation": "%u5A7A%u6E90%2CWYG"})#婺源
-        driver.cookies.add({"_jc_save_fromDate": "2018-11-30"})
+        driver.cookies.add({"_jc_save_fromDate": "2018-12-15"})
 
         sleep(1)
         driver.reload()
@@ -97,32 +105,44 @@ def book_ticket(ticket_url):
                 driver.find_by_text("查询").click()
                 count += 1
                 print(" \r -----第{}次刷新-----" .format(count))
-                try:
-                    js='var tbody=document.querySelector("#queryLeftTable");var array = tbody.getElementsByTagName("tr");' \
-                       'var index=new Array();' \
-                       'for(var i = 0; i < array.length/2; i++) {' \
-                       'var tds = array[i*2].children;' \
-                       'var tag=tds['+seatType+'].innerHTML;' \
-                       'if(tag!="<div>无</div>"&&tag!="--")' \
-                       '{' \
-                       'index.push(i);' \
-                       '}' \
-                       '};' \
-                       'document.getElementById("fromStationText_label").innerHTML = index;' \
-                    # driver.execute_script('document.getElementById("fromStationText_label").innerHTML = "meto";')
-                    sleep(2)
-                    driver.execute_script(js)
-                    print(driver.find_by_id('fromStationText_label')[0].value)
-                    indexArr=driver.find_by_id('fromStationText_label')[0].value.split(',')
-                    orderButtons=driver.find_by_text("预订")
-                    for i in indexArr:
-                        print(i)
-                        orderButtons[int(i)].click()
+                if allType:
+                    try:
+                        print("无限制抢票")
+                        for i in driver.find_by_text("预订"):
+                            i.click()
+                            sleep(2)
+                    except Exception as e:
+                        print(e)
+                        print("尚未开始预订")
+                        continue
+                else:
+                    try:
+                        js='var tbody=document.querySelector("#queryLeftTable");var array = tbody.getElementsByTagName("tr");' \
+                           'var index=new Array();' \
+                           'for(var i = 0; i < array.length/2; i++) {' \
+                           'var tds = array[i*2].children;' \
+                           'var tag=tds['+str(seatType)+'].innerHTML;' \
+                           'if(tag!="<div>无</div>"&&tag!="--")' \
+                           '{' \
+                           'index.push(i);' \
+                           '}' \
+                           '};' \
+                           'document.getElementById("fromStationText_label").innerHTML = index;' \
+                        # driver.execute_script('document.getElementById("fromStationText_label").innerHTML = "meto";')
                         sleep(2)
-                except Exception as e:
-                    print(e)
-                    print("尚未开始预订")
-                    continue
+                        driver.execute_script(js)
+                        print(driver.find_by_id('fromStationText_label')[0].value)
+                        indexArr=driver.find_by_id('fromStationText_label')[0].value.split(',')
+                        orderButtons=driver.find_by_text("预订")
+                        if indexArr[0]!='':
+                            for i in indexArr:
+                                print(i)
+                                orderButtons[int(i)].click()
+                                sleep(2)
+                    except Exception as e:
+                        print(e)
+                        print("尚未开始预订")
+                        continue
         print("\n\n****开始预订****")
         print('\n>>>开始选择用户')
         for u in user:
@@ -137,7 +157,7 @@ def book_ticket(ticket_url):
         # 支付部分
         while True:
             if onlinepay_url in driver.url:
-                sleep(8)
+                sleep(6)
                 print("开始支付...")
                 driver.find_by_id("payButton").click()
                 break
@@ -145,10 +165,12 @@ def book_ticket(ticket_url):
         driver.windows.current=driver.windows[1]
         sleep(1)
         driver.find_by_xpath("/html/body/div[2]/div[2]/div/form/div[9]/div/img").click()
-        sleep(2)
         while True:
             if payment_url in driver.url:
-                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/WorkSpace/LearnPy/Book_Tickets/screen.png")
+                sleep(1)
+                driver.reload()
+                sleep(2)
+                screenshotURL = driver.screenshot("D:/PyCharm 2018.2.4/workspace/LearnPy/learn/GetTickets/screen.png")
                 screenshotName = screenshotURL.split('\\')[-1]
                 print('网页截图的名字：')
                 print(screenshotName)
